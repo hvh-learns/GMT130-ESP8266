@@ -1,5 +1,7 @@
 #include <Adafruit_GFX.h>     // Core graphics library
 #include <Adafruit_ST7789.h>  // Hardware-specific library for ST7789
+#include <cstring>
+#include "7seg20.h"
 #include "ElapsedTime.h"
 
 using namespace MyApp;
@@ -32,10 +34,14 @@ using namespace MyApp;
 // MOSI(DIN) ---> NodeMCU pin D7 (GPIO13)
 Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
-GFXcanvas1 canvas(164, 30);  // 1-bit, 120x30 pixels
+GFXcanvas1 canvas(50, 30);  // 1-bit, 120x30 pixels
 
 int period = 1000;
 unsigned long time_now = 0;
+
+char posOne[3];
+char posTwo[3];
+char posThree[3];
 
 void setup() {
   Serial.begin(9600);
@@ -49,56 +55,52 @@ void setup() {
   canvas.setTextSize(1);
   canvas.setTextWrap(false);  // clip text to canvas
 
-  
 }
 
 void loop() {
+
   if ((unsigned long)(millis() - time_now) > period) {
     time_now = millis();
+    char posOneTmp[3], posTwoTmp[3], posThreeTmp[3];
     MyApp::ElapsedTime elapsedTime(time_now);
-    showElapsedTime(elapsedTime.getTime());
+    elapsedTime.getTime(posOneTmp, posTwoTmp, posThreeTmp);
+    showElapsedTime(posOneTmp, posTwoTmp, posThreeTmp);
   }
 }
 
-// void getTimeFromElapsedMillis(unsigned long *day, unsigned long *hour, unsigned long *min, unsigned long *sec) {
-//   *day = time_now / MILLI_SENCOND_PER_DAY;
-//   *hour = (time_now % MILLI_SENCOND_PER_DAY) / MILLI_SENCOND_PER_HOUR;
-//   *min = (time_now % MILLI_SENCOND_PER_DAY % MILLI_SENCOND_PER_HOUR) / MILLI_SENCOND_PER_MIN;
-//   *sec = (time_now % MILLI_SENCOND_PER_DAY % MILLI_SENCOND_PER_HOUR % MILLI_SENCOND_PER_MIN) / MILLI_SENCOND_PER_SEC;
-// }
+void showElapsedTime(char* posOneTmp, char* posTwoTmp, char* posThreeTmp) {
 
-// void getTwoDigit(unsigned long number, char* buf) {
-//   if (number < 10) {
-//     sprintf(buf, "0%1d", number);
-//   } else {
-//     sprintf(buf, "%2d", number);
-//   }
-// }
-
-// void getElapsedTime(unsigned long day, unsigned long hour, unsigned long min, unsigned long sec, char* buf) {
-//   char bufHour[3];
-//   char bufMin[3];
-//   getTwoDigit(hour, bufHour);
-//   getTwoDigit(min, bufMin);
-//   if(day != 0) {
-//     char bufDay[3];
-//     getTwoDigit(day, bufDay);
-//     sprintf(buf, "%2s:%2s:%2s", bufDay, bufHour, bufMin);
-//   } else {
-//     char bufSec[3];
-//     getTwoDigit(sec, bufSec);
-//     sprintf(buf, "%2s:%2s:%2s", bufHour, bufMin, bufSec);
-//   }
-// }
-
-void showElapsedTime(char* time) {
-
-  canvas.fillScreen(0);  // Clear canvas (not display)
-  
-  canvas.setCursor(0, 30);  // Pos. is BASE LINE when using fonts!
-  canvas.print(time);        // Print elapsed time in milliseconds
-  // canvas.drawRect(0, 0, canvas.width(), canvas.height(), RED);
-
-  display.drawBitmap(36, 5, canvas.getBuffer(),
-                     canvas.width(), canvas.height(), BLACK, WHITE);
+  if (strcmp(posOneTmp, posOne) != 0) {
+    Serial.println("draw PosOne");
+    sprintf(posOne, "%2s", posOneTmp);
+    canvas.fillScreen(0);
+    canvas.setCursor(0, 30);
+    canvas.print(posOne);
+    canvas.drawRect(0, 0, canvas.width(), canvas.height(), BLACK);
+    
+    display.drawBitmap(36, 5, canvas.getBuffer(),
+                       canvas.width(), canvas.height(), BLACK, WHITE);
+  }
+  if (strcmp(posTwoTmp, posTwo) != 0) {
+    Serial.println("draw PosTwo");
+    sprintf(posTwo, "%2s", posTwoTmp);
+    canvas.fillScreen(0);
+    canvas.setCursor(0, 30);
+    canvas.print(posTwo);
+    canvas.drawRect(0, 0, canvas.width(), canvas.height(), BLACK);
+    
+    display.drawBitmap(96, 5, canvas.getBuffer(),
+                       canvas.width(), canvas.height(), BLACK, WHITE);
+  }
+  if (strcmp(posThreeTmp, posThree) != 0) {
+    Serial.println("draw PosThree");
+    sprintf(posThree, "%2s", posThreeTmp);
+    canvas.fillScreen(0);
+    canvas.setCursor(0, 30);
+    canvas.print(posThree);
+    canvas.drawRect(0, 0, canvas.width(), canvas.height(), BLACK);
+    
+    display.drawBitmap(156, 5, canvas.getBuffer(),
+                       canvas.width(), canvas.height(), BLACK, WHITE);
+  }
 }
