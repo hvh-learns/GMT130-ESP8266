@@ -24,17 +24,12 @@ using namespace MyApp;
 #define YELLOW 0xFFE0
 #define WHITE 0xFFFF
 
-// #define MILLI_SENCOND_PER_SEC 1000
-// #define MILLI_SENCOND_PER_MIN 60000
-// #define MILLI_SENCOND_PER_HOUR 3600000
-// #define MILLI_SENCOND_PER_DAY 86400000
-
 // initialize ST7789 TFT library with hardware SPI module
 // SCK (CLK) ---> NodeMCU pin D5 (GPIO14)
 // MOSI(DIN) ---> NodeMCU pin D7 (GPIO13)
 Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
-GFXcanvas1 canvas(50, 30);  // 1-bit, 120x30 pixels
+GFXcanvas1 canvas(60, 30);  // 1-bit, 120x30 pixels
 
 int period = 1000;
 unsigned long time_now = 0;
@@ -55,6 +50,9 @@ void setup() {
   canvas.setTextSize(1);
   canvas.setTextWrap(false);  // clip text to canvas
 
+  // canvas.drawRect(0, 0, canvas.width(), canvas.height(), RED);
+
+  // display.drawBitmap(36, 5, canvas.getBuffer(), canvas.width(), canvas.height(), BLACK, WHITE);
 }
 
 void loop() {
@@ -70,15 +68,22 @@ void loop() {
 
 void showElapsedTime(char* posOneTmp, char* posTwoTmp, char* posThreeTmp) {
 
+  int16_t x1, y1;
+  uint16_t w, h;
+
   if (strcmp(posOneTmp, posOne) != 0) {
     Serial.println("draw PosOne");
     sprintf(posOne, "%2s", posOneTmp);
     canvas.fillScreen(0);
     canvas.setCursor(0, 30);
     canvas.print(posOne);
-    canvas.drawRect(0, 0, canvas.width(), canvas.height(), BLACK);
-    
-    display.drawBitmap(36, 5, canvas.getBuffer(),
+
+    canvas.getTextBounds(posOne, 0, 30, &x1, &y1, &w, &h);
+    canvas.drawRect(x1, y1, w, h, RED);
+
+    canvas.drawRect(0, 0, canvas.width(), canvas.height(), RED);
+
+    display.drawBitmap(30, 5, canvas.getBuffer(),
                        canvas.width(), canvas.height(), BLACK, WHITE);
   }
   if (strcmp(posTwoTmp, posTwo) != 0) {
@@ -87,9 +92,13 @@ void showElapsedTime(char* posOneTmp, char* posTwoTmp, char* posThreeTmp) {
     canvas.fillScreen(0);
     canvas.setCursor(0, 30);
     canvas.print(posTwo);
-    canvas.drawRect(0, 0, canvas.width(), canvas.height(), BLACK);
-    
-    display.drawBitmap(96, 5, canvas.getBuffer(),
+
+    canvas.getTextBounds(posOne, 0, 30, &x1, &y1, &w, &h);
+    canvas.drawRect(x1, y1, w, h, RED);
+
+    canvas.drawRect(0, 0, canvas.width(), canvas.height(), RED);
+
+    display.drawBitmap(90, 5, canvas.getBuffer(),
                        canvas.width(), canvas.height(), BLACK, WHITE);
   }
   if (strcmp(posThreeTmp, posThree) != 0) {
@@ -98,9 +107,13 @@ void showElapsedTime(char* posOneTmp, char* posTwoTmp, char* posThreeTmp) {
     canvas.fillScreen(0);
     canvas.setCursor(0, 30);
     canvas.print(posThree);
-    canvas.drawRect(0, 0, canvas.width(), canvas.height(), BLACK);
-    
-    display.drawBitmap(156, 5, canvas.getBuffer(),
+
+    canvas.getTextBounds(posOne, 0, 30, &x1, &y1, &w, &h);
+    canvas.drawRect(x1, y1, w, h, RED);
+
+    canvas.drawRect(0, 0, canvas.width(), canvas.height(), RED);
+
+    display.drawBitmap(150, 5, canvas.getBuffer(),
                        canvas.width(), canvas.height(), BLACK, WHITE);
   }
 }
